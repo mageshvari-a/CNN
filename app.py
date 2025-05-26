@@ -22,12 +22,15 @@ uploaded_file = st.file_uploader("Upload an image...", type=["png", "jpg", "jpeg
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).resize((32, 32))
-    st.image(image, caption='Uploaded Image', use_column_width=True)
+    st.image(image, caption='Uploaded Image', use_container_width=True)
     
-    # Preprocess image
-    img_array = np.array(image) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)  # Model expects batch dimension
-    
+    # Load and preprocess image
+    image = Image.open(uploaded_file)         # uploaded_file from st.file_uploader
+    image = image.resize((32, 32))            # Resize to match CIFAR-10 input
+    image = np.array(image)                   # Convert to array
+    image = image / 255.0                     # Normalize to [0, 1]
+    img_array = np.expand_dims(image, axis=0) # Shape: (1, 32, 32, 3)
+  
     # Prediction
     predictions = model.predict(img_array)
     predicted_class = class_names[np.argmax(predictions)]
